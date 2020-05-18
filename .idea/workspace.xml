@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated />
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="60eb001f-09b9-44fc-93fe-9a0c435bac44" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="ProjectId" id="1bFADyXisHQAmm6E9mwrvWof4PJ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../stable_qemu-5.0.0" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="60eb001f-09b9-44fc-93fe-9a0c435bac44" name="Default Changelist" comment="" />
+      <created>1588217351432</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1588217351432</updated>
+      <workItem from="1588217353296" duration="1658000" />
+      <workItem from="1588265054729" duration="599000" />
+      <workItem from="1588377854738" duration="648000" />
+      <workItem from="1588434391402" duration="595000" />
+      <workItem from="1588472160865" duration="16141000" />
+      <workItem from="1588560081189" duration="25656000" />
+      <workItem from="1588639847150" duration="12014000" />
+      <workItem from="1588667373473" duration="19731000" />
+      <workItem from="1588730155745" duration="30638000" />
+      <workItem from="1588838684953" duration="14493000" />
+      <workItem from="1588900950067" duration="18676000" />
+      <workItem from="1588937043598" duration="761000" />
+      <workItem from="1588954370072" duration="1815000" />
+      <workItem from="1588986722459" duration="9688000" />
+      <workItem from="1589005505588" duration="13134000" />
+      <workItem from="1589465723863" duration="9194000" />
+      <workItem from="1589507129862" duration="10616000" />
+      <workItem from="1589546293096" duration="11382000" />
+      <workItem from="1589593364894" duration="17685000" />
+      <workItem from="1589698539800" duration="12241000" />
+      <workItem from="1589761130533" duration="598000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="1239" y="310" width="424" height="484" key="FileChooserDialogImpl" timestamp="1589546993050">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="1239" y="310" width="424" height="484" key="FileChooserDialogImpl/67.27.1853.1053@67.27.1853.1053" timestamp="1589546993050" />
+    <state x="649" y="380" key="com.intellij.ide.util.TipDialog" timestamp="1588560280151">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="649" y="380" key="com.intellij.ide.util.TipDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1588560280151" />
+    <state x="962" y="369" width="916" height="578" key="find.popup" timestamp="1589718407323">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="962" y="369" width="916" height="578" key="find.popup/67.27.1853.1053@67.27.1853.1053" timestamp="1589718407323" />
+    <state x="1119" y="257" width="672" height="678" key="search.everywhere.popup" timestamp="1588758523900">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="1119" y="257" width="672" height="678" key="search.everywhere.popup/67.27.1853.1053@67.27.1853.1053" timestamp="1588758523900" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/tcg/tcg.c</url>
+          <line>5655</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
