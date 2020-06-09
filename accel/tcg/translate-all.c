@@ -226,8 +226,6 @@ LLVMTypeRef target_ulong_type;
 LLVMTypeRef temp_val_type;
 LLVMTypeRef temp_val_types[512];
 
-//relocs* label_relocs[TCG_MAX_LABELS];
-//LLVMBasicBlockRef label_to_bb[TCG_MAX_LABELS];
 LLVMValueRef func_ld8;
 LLVMValueRef func_ld16;
 LLVMValueRef func_ld32;
@@ -326,22 +324,7 @@ static unsigned long long helper_func_exec_cnt = 0;
 uint64_t helper_func(tcg_target_ulong func_addr, uint64_t param0, uint64_t param1, uint64_t param2, uint64_t param3, uint64_t param4, uint64_t param5, uint64_t param6, uint64_t param7, uint64_t param8
         , uint64_t param9)
 {
-//    if(tb_count == 68)
-//        func_addr += 100;
-//    printf("helper_func_exec_cnt = %llu\n", helper_func_exec_cnt);
-//    helper_func_exec_cnt++;
     uint64_t (*p)() = func_addr;
-//      printf("func_addr = %llu\n", func_addr);
-//      printf("param0 = %llu\n", param0);
-//        printf("param1 = %llu\n", param1);
-//        printf("param2 = %llu\n", param2);
-//        printf("param3 = %llu\n", param3);
-//        printf("param4 = %llu\n", param4);
-//        printf("param5 = %llu\n", param5);
-//        printf("param6 = %llu\n", param6);
-//        printf("param7 = %llu\n", param7);
-//        printf("param8 = %llu\n", param8);
-//        printf("param9 = %llu\n", param9);
     uint64_t ret;
     ret = p(param0,
             param1,
@@ -353,8 +336,6 @@ uint64_t helper_func(tcg_target_ulong func_addr, uint64_t param0, uint64_t param
             param7,
             param8,
             param9);
-//    printf("ret = %llu\n", ret);
-//    printf("before return\n");
     return ret;
 }
 
@@ -378,10 +359,7 @@ uint32_t ld32_helper(tcg_target_ulong addr)
 
 uint64_t ld64_helper(tcg_target_ulong addr)
 {
-//    printf("ld64_helper\n");
-//    printf("addr = %llu\n", (uint64_t)(addr));
     uint64_t ret = *(uint64_t*)(addr);
-//    printf("ld64_helper end\n");
     return ret;
 }
 
@@ -442,31 +420,7 @@ void reset_interpreter(CPUArchState *env)
     bigendian = 1;
 #endif
 
-#if defined(TARGET_ARM)
 
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[0], (void*)(&mem_temps[0]));
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[1], (void*)(&mem_temps[1]));
-
-    for(int i = 2; i <= 17; ++i)
-    {
-        LLVMAddGlobalMapping(Interpreter, llvm_temps[i], (void*)(&(env->regs[i-2])));
-    }
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[18], (void*)(&(env->CF)));
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[19], (void*)(&(env->NF)));
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[20], (void*)(&(env->VF)));
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[21], (void*)(&(env->ZF)));
-
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[22], (void*)(&(env->exclusive_addr)));
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[23], (void*)(&(env->exclusive_val)));
-
-    int nb_globals;
-    nb_globals = 24;
-    for(int i = nb_globals; i < 512; ++i)
-    {
-        LLVMAddGlobalMapping(Interpreter, llvm_temps[i], (void*)(&mem_temps[i]));
-    }
-
-#elif defined(TARGET_X86_64)
     int nxt_tmp_idx = 0;
     LLVMAddGlobalMapping(Interpreter, llvm_temps[nxt_tmp_idx++], (void*)(&mem_temps[0]));
     LLVMAddGlobalMapping(Interpreter, llvm_temps[nxt_tmp_idx++], (void*)(&mem_temps[1]));
@@ -500,7 +454,6 @@ void reset_interpreter(CPUArchState *env)
     LLVMAddGlobalMapping(Interpreter, llvm_temps[nxt_tmp_idx++], (intptr_t) (&(env->cc_src2)));
     for (i = 0; i < CPU_NB_REGS; ++i) {
         LLVMAddGlobalMapping(Interpreter, llvm_temps[nxt_tmp_idx++], (intptr_t) (&(env->regs[i])));
-//        printf("tmp_idx = %d  reg_idx = %d", nxt_tmp_idx-1, i);
     }
 
     for (i = 0; i < 6; ++i) {
@@ -515,8 +468,6 @@ void reset_interpreter(CPUArchState *env)
     for (int i = nxt_tmp_idx; i < 512; ++i) {
         LLVMAddGlobalMapping(Interpreter, llvm_temps[i], (void *) (&mem_temps[i]));
     }
-
-#endif
 
     LLVMAddGlobalMapping(Interpreter, llvm_tb_ptr, (void *) (&tci_tb_ptr));
     LLVMAddGlobalMapping(Interpreter, Helper_func, (void*)(helper_func));
@@ -545,11 +496,6 @@ void reset_interpreter(CPUArchState *env)
     LLVMAddGlobalMapping(Interpreter, Empty_func_tb, (void*)(empty_func_tb));
 }
 
-
-void x86_init_jit(CPUArchState *env)
-{
-
-}
 
 void init_jit(CPUArchState *env) {
     int i;
@@ -736,12 +682,10 @@ int bigendian = 0;
 #endif
 
 
-#if defined(TARGET_I386)
     llvm_temps[nxt_tmp_idx++] = LLVMAddGlobal(M, LLVMInt32TypeInContext(llvm_ctx), "cc_op");
     LLVMAddGlobalMapping(EE, llvm_temps[2], (void *) (&(env->cc_op)));
     LLVMAddGlobalMapping(Interpreter, llvm_temps[2], (void *) (&(env->cc_op)));
     temp_val_types[nxt_tmp_idx-1] = LLVMInt32TypeInContext(llvm_ctx);
-#if defined(TARGET_X86_64)
 #if TCG_TARGET_REG_BITS == 32
     llvm_temps[nxt_tmp_idx++] = LLVMAddGlobal(M, LLVMInt32TypeInContext(llvm_ctx), "cc_dst_low");
     LLVMAddGlobalMapping(EE, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->cc_dst)) + bigendian * 4);
@@ -838,7 +782,6 @@ int bigendian = 0;
         llvm_temps[nxt_tmp_idx++] = LLVMAddGlobal(M, LLVMInt64TypeInContext(llvm_ctx), name);
         LLVMAddGlobalMapping(EE, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->regs[i])));
         LLVMAddGlobalMapping(Interpreter, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->regs[i])));
-//        printf("tmp_idx = %d  reg_idx = %d\n", nxt_tmp_idx-1, i);
         temp_val_types[nxt_tmp_idx-1] = LLVMInt64TypeInContext(llvm_ctx);
     }
 
@@ -865,55 +808,6 @@ int bigendian = 0;
 
 #endif
 
-#else
-    llvm_temps[nxt_tmp_idx++] = LLVMAddGlobal(M, LLVMInt32TypeInContext(llvm_ctx), "cc_dst");
-    LLVMAddGlobalMapping(EE, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->cc_dst)));
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->cc_dst)));
-    temp_val_types[nxt_tmp_idx-1] = LLVMInt32TypeInContext(llvm_ctx);
-
-    llvm_temps[nxt_tmp_idx++] = LLVMAddGlobal(M, LLVMInt32TypeInContext(llvm_ctx), "cc_src");
-    LLVMAddGlobalMapping(EE, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->cc_src)));
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->cc_src)));
-    temp_val_types[nxt_tmp_idx-1] = LLVMInt32TypeInContext(llvm_ctx);
-
-
-    llvm_temps[nxt_tmp_idx++] = LLVMAddGlobal(M, LLVMInt32TypeInContext(llvm_ctx), "cc_src2");
-    LLVMAddGlobalMapping(EE, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->cc_src2)));
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->cc_src2)));
-    temp_val_types[nxt_tmp_idx-1] = LLVMInt32TypeInContext(llvm_ctx);
-
-
-    for (i = 0; i < CPU_NB_REGS; ++i) {
-        sprintf(name, "temp%d", nxt_tmp_idx);
-        llvm_temps[nxt_tmp_idx++] = LLVMAddGlobal(M, LLVMInt32TypeInContext(llvm_ctx), name);
-        LLVMAddGlobalMapping(EE, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->regs[i])));
-        LLVMAddGlobalMapping(Interpreter, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->regs[i])));
-        temp_val_types[nxt_tmp_idx-1] = LLVMInt32TypeInContext(llvm_ctx);
-
-    }
-
-    for (i = 0; i < 6; ++i) {
-        sprintf(name, "temp%d", nxt_tmp_idx);
-        llvm_temps[nxt_tmp_idx++] = LLVMAddGlobal(M, LLVMInt32TypeInContext(llvm_ctx), name);
-        LLVMAddGlobalMapping(EE, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->segs[i].base)));
-        LLVMAddGlobalMapping(Interpreter, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->segs[i].base)));
-        temp_val_types[nxt_tmp_idx-1] = LLVMInt32TypeInContext(llvm_ctx);
-    }
-    for (i = 0; i < 4; ++i) {
-        sprintf(name, "temp%d", nxt_tmp_idx);
-        llvm_temps[nxt_tmp_idx++] = LLVMAddGlobal(M, LLVMInt32TypeInContext(llvm_ctx), name);
-        LLVMAddGlobalMapping(EE, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->bnd_regs[i].lb)));
-        LLVMAddGlobalMapping(Interpreter, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->bnd_regs[i].lb)));
-        temp_val_types[nxt_tmp_idx-1] = LLVMInt32TypeInContext(llvm_ctx);
-
-        sprintf(name, "temp%d", nxt_tmp_idx);
-        llvm_temps[nxt_tmp_idx++] = LLVMAddGlobal(M, LLVMInt32TypeInContext(llvm_ctx), name);
-        LLVMAddGlobalMapping(EE, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->bnd_regs[i].ub)));
-        LLVMAddGlobalMapping(Interpreter, llvm_temps[nxt_tmp_idx-1], (intptr_t) (&(env->bnd_regs[i].ub)));
-        temp_val_types[nxt_tmp_idx-1] = LLVMInt32TypeInContext(llvm_ctx);
-
-    }
-#endif
     for (int i = nxt_tmp_idx; i < 512; ++i) {
         sprintf(name, "temp%d", i);
         llvm_temps[i] = LLVMAddGlobal(M, temp_val_type, name);
@@ -925,59 +819,7 @@ int bigendian = 0;
 
 
 
-#elif defined(TARGET_ARM)
 
-    for (int i = 2; i <= 17; ++i) {
-        sprintf(name, "temp%d", i);
-        llvm_temps[i] = LLVMAddGlobal(M, LLVMInt32TypeInContext(llvm_ctx), name);
-//        printf("Linkage of llvm_temps[%d] = %d\n", i, LLVMGetLinkage(llvm_temps[i]));
-        temp_val_types[i] = LLVMInt32TypeInContext(llvm_ctx);
-        LLVMAddGlobalMapping(EE, llvm_temps[i], (void *) (&(env->regs[i - 2])));
-    }
-    for (int i = 18; i <= 23; ++i) {
-        sprintf(name, "temp%d", i);
-        llvm_temps[i] = LLVMAddGlobal(M, LLVMInt32TypeInContext(llvm_ctx), name);
-        temp_val_types[i] = LLVMInt32TypeInContext(llvm_ctx);
-    }
-    LLVMAddGlobalMapping(EE, llvm_temps[18], (void *) (&(env->CF)));
-    LLVMAddGlobalMapping(EE, llvm_temps[19], (void *) (&(env->NF)));
-    LLVMAddGlobalMapping(EE, llvm_temps[20], (void *) (&(env->VF)));
-    LLVMAddGlobalMapping(EE, llvm_temps[21], (void *) (&(env->ZF)));
-
-    LLVMAddGlobalMapping(EE, llvm_temps[22], (void *) (&(env->exclusive_addr)));
-    LLVMAddGlobalMapping(EE, llvm_temps[23], (void *) (&(env->exclusive_val)));
-
-
-    int nb_globals;
-    nb_globals = 24;
-
-
-
-    for (int i = nb_globals; i < 512; ++i) {
-        sprintf(name, "temp%d", i);
-        llvm_temps[i] = LLVMAddGlobal(M, LLVMInt64TypeInContext(llvm_ctx), name);
-        temp_val_types[i] = LLVMInt64TypeInContext(llvm_ctx);
-        LLVMAddGlobalMapping(EE, llvm_temps[i], (void *) (&mem_temps[i]));
-    }
-
-    for (int i = 2; i <= 17; ++i)
-    {
-        LLVMAddGlobalMapping(Interpreter, llvm_temps[i], (void *) (&(env->regs[i - 2])));
-    }
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[18], (void*)(&(env->CF)));
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[19], (void*)(&(env->NF)));
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[20], (void*)(&(env->VF)));
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[21], (void*)(&(env->ZF)));
-
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[22], (void*)(&(env->exclusive_addr)));
-    LLVMAddGlobalMapping(Interpreter, llvm_temps[23], (void*)(&(env->exclusive_val)));
-
-
-    for(int i = nb_globals; i < 512; ++i) {
-        LLVMAddGlobalMapping(Interpreter, llvm_temps[i], (void *) (&mem_temps[i]));
-    }
-
-#endif
 
     llvm_tb_ptr =  LLVMAddGlobal(M, temp_val_type, "tb_ptr");
     LLVMAddGlobalMapping(EE, llvm_tb_ptr, (void *) (&tci_tb_ptr));
@@ -1019,7 +861,6 @@ int bigendian = 0;
     LLVMAddGlobalMapping(Interpreter, Debug_print_start, (void*)(debug_print_start));
     LLVMAddGlobalMapping(Interpreter, Debug_print_end, (void*)(debug_print_end));
     LLVMAddGlobalMapping(Interpreter, Debug_print_pc, (void*)(debug_print_pc));
-
 
 #if defined(CONFIG_USER_ONLY)
 #if TARGET_VIRT_ADDR_SPACE_BITS <= 32
@@ -2504,7 +2345,6 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
 
 
 
-    //LLVMModuleRef M2 = LLVMModuleCreateWithNameInContext("", llvm_ctx);
     LLVMModuleRef M2 = LLVMCloneModule(M);
     LLVMSetModuleDataLayout(M2, DataLayout);
     LLVMSetTarget(M2, TargetTriple);
@@ -2560,8 +2400,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
     tb->llvm_jmp_dest[0] = NULL;
     tb->llvm_jmp_dest[1] = NULL;
     tcg_ctx->tb_cflags = cflags;
-//    sprintf(tb->file_name, "run_log_%llu", tb_gen_code_cnt);
-//    sprintf(tb->tcg_file_name, "tcg_run_log_%llu", tb_gen_code_cnt);
+    sprintf(tb->file_name, "tcg_run_log_%llu", tb_gen_code_cnt);
     tb->exec_cnt = 0;
  tb_overflow:
 

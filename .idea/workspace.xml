@@ -9,7 +9,18 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="60eb001f-09b9-44fc-93fe-9a0c435bac44" name="Default Changelist" comment="" />
+    <list default="true" id="60eb001f-09b9-44fc-93fe-9a0c435bac44" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Makefile.target" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile.target" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accel/tcg/cpu-exec.c" beforeDir="false" afterPath="$PROJECT_DIR$/accel/tcg/cpu-exec.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accel/tcg/translate-all.c" beforeDir="false" afterPath="$PROJECT_DIR$/accel/tcg/translate-all.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configure" beforeDir="false" afterPath="$PROJECT_DIR$/configure" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/exec/exec-all.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/exec/exec-all.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/tcg/tcg.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/tcg/tcg.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rules.mak" beforeDir="false" afterPath="$PROJECT_DIR$/rules.mak" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tcg/tcg.c" beforeDir="false" afterPath="$PROJECT_DIR$/tcg/tcg.c" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -32,15 +43,19 @@
     <expand />
     <select />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1bFADyXisHQAmm6E9mwrvWof4PJ" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../stable_qemu-5.0.0" />
   </component>
   <component name="SvnConfiguration">
@@ -74,11 +89,25 @@
       <workItem from="1589593364894" duration="17685000" />
       <workItem from="1589698539800" duration="12241000" />
       <workItem from="1589761130533" duration="598000" />
+      <workItem from="1589790797746" duration="1407000" />
+      <workItem from="1589848859155" duration="599000" />
+      <workItem from="1589939510946" duration="7026000" />
+      <workItem from="1590045558565" duration="599000" />
+      <workItem from="1590196446888" duration="599000" />
+      <workItem from="1590479241039" duration="599000" />
+      <workItem from="1590547393696" duration="4399000" />
+      <workItem from="1590719071005" duration="599000" />
+      <workItem from="1590802205060" duration="659000" />
+      <workItem from="1591075440888" duration="9827000" />
+      <workItem from="1591415953613" duration="1897000" />
+      <workItem from="1591491604436" duration="599000" />
+      <workItem from="1591582757810" duration="599000" />
+      <workItem from="1591665491659" duration="4352000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
+    <option name="version" value="2" />
   </component>
   <component name="WindowStateProjectService">
     <state x="1239" y="310" width="424" height="484" key="FileChooserDialogImpl" timestamp="1589546993050">
@@ -89,24 +118,13 @@
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="649" y="380" key="com.intellij.ide.util.TipDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1588560280151" />
-    <state x="962" y="369" width="916" height="578" key="find.popup" timestamp="1589718407323">
+    <state x="962" y="369" width="916" height="578" key="find.popup" timestamp="1591668811514">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="962" y="369" width="916" height="578" key="find.popup/67.27.1853.1053@67.27.1853.1053" timestamp="1589718407323" />
+    <state x="962" y="369" width="916" height="578" key="find.popup/67.27.1853.1053@67.27.1853.1053" timestamp="1591668811514" />
     <state x="1119" y="257" width="672" height="678" key="search.everywhere.popup" timestamp="1588758523900">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="1119" y="257" width="672" height="678" key="search.everywhere.popup/67.27.1853.1053@67.27.1853.1053" timestamp="1588758523900" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/tcg/tcg.c</url>
-          <line>5655</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

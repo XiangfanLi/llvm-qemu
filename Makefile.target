@@ -124,6 +124,8 @@ obj-$(CONFIG_PLUGIN) += plugins/
 #########################################################
 # Linux user emulator target
 
+QEMU_CFLAGS+=-Wall
+
 ifdef CONFIG_LINUX_USER
 
 QEMU_CFLAGS+=-I$(SRC_PATH)/linux-user/$(TARGET_ABI_DIR) \

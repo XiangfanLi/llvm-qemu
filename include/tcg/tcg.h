@@ -952,6 +952,8 @@ void tcg_func_start(TCGContext *s);
 
 int tcg_gen_code(TCGContext *s, TranslationBlock *tb);
 
+//int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb);
+
 void tcg_set_frame(TCGContext *s, TCGReg reg, intptr_t start, intptr_t size);
 
 TCGTemp *tcg_global_mem_new_internal(TCGType, TCGv_ptr,

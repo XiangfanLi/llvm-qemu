@@ -4018,16 +4018,9 @@ int64_t tcg_cpu_exec_time(void)
 #endif
 
 
-
+// transfer TCG intermediate code to LLVM IR (intermediate representation)
 int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
 {
-//    printf("s->nb_globals = %llu\n", s->nb_globals);
-//    if(tb->seq_num > 18000)
-//     printf("gen_code begin, tb->seq_num = %llu\n", tb->seq_num);
-//    printf("llvm_gen_code begin\n");
-
-
-
     LLVMValueRef func = tb->func_ptr;
     uint64_t arg0, arg1, arg2, arg3;
     LLVMBuilderRef IR = LLVMCreateBuilderInContext(llvm_ctx);
@@ -4045,52 +4038,8 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
     LLVMValueRef debug_params[1];
     QTAILQ_FOREACH(op, &s->ops, link)
     {
-
         TCGOpcode opc = op->opc;
-//        if(tb->seq_num > 18000)
-//        printf("gen opc begin, opc = %llu\n", opc);
-//        printf("opc = %llu\n", opc);
-//        TCGOpDef* def = &tcg_op_defs[opc];
-//        int n = def->nb_iargs + def->nb_oargs;
-//        for(int i = 0; i < n; ++i)
-//        {
-//            printf("args[%d] = %llu\n", i, temp_idx(arg_temp(op->args[i])));
-//        }
-//if(tb->seq_num > 12400) {
-//    debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), opc, 0);
-//    LLVMBuildCall2(IR, funcType_debug, Debug_print_start, debug_params, 1, "");
-//
-//        TCGOpDef *def = &tcg_op_defs[opc];
-//
-//        debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), def->nb_iargs, 0);
-//        LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-//
-//        debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), def->nb_oargs, 0);
-//        LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-//
-//        debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), def->nb_cargs, 0);
-//        LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-//        for(int i = 0; i < def->nb_oargs + def->nb_iargs; ++i)
-//        {
-//            debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), temp_idx(arg_temp(op->args[i])), 0);
-//            LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-//        }
-//
-//        for(int i = 0; i < def->nb_cargs; ++i)
-//        {
-//            debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), op->args[i+def->nb_oargs+def->nb_iargs], 0);
-//            LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-//        }
-//        debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), 7777777777777ULL, 0);
-//        LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-//
-//        debug_params[0] = LLVMBuildLoad2(IR, temp_val_types[10], llvm_temps[10], "");
-//        LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-
-
-//}
         LLVMBuildStore(IR, TbPtr, llvm_tb_ptr);
-//        LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
         if(opc != INDEX_op_insn_start && opc != INDEX_op_discard && opc != INDEX_op_set_label)
         {
             TbPtr = LLVMBuildAdd(IR, TbPtr, LLVMConstInt(temp_val_type, 1, 0), "");
@@ -4112,12 +4061,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                 arg0 = temp_idx(arg_temp(op->args[0]));
                 arg1 = temp_idx(arg_temp(op->args[1]));
                 LLVMValueRef Load = LLVMBuildLoad2(IR, temp_val_types[arg1], llvm_temps[arg1], "");
-//                debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), arg1, 0);
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-//                debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), arg0, 0);
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-//                debug_params[0] = Load;
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
                 LLVMBuildStore(IR, LLVMBuildZExtOrBitCast(IR, Load, temp_val_types[arg0], ""), llvm_temps[arg0]);
                 break;
             }
@@ -4134,10 +4077,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
             {
                 arg0 = temp_idx(arg_temp(op->args[0]));
                 arg1 = op->args[1];
-//                debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), arg1, 0);
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-//                debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), arg0, 0);
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
                 uint32_t arg32 = (uint32_t)(arg1);
                 LLVMValueRef temp = LLVMConstInt(temp_val_types[arg0], arg32, 0);
                 LLVMBuildStore(IR, temp, llvm_temps[arg0]);
@@ -4147,10 +4086,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
             {
                 arg0 = temp_idx(arg_temp(op->args[0]));
                 arg1 = op->args[1];
-//                debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), arg1, 0);
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-//                debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), arg0, 0);
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
                 LLVMValueRef temp = LLVMConstInt(temp_val_types[arg0], arg1, 0);
                 LLVMBuildStore(IR, temp, llvm_temps[arg0]);
                 break;
@@ -4174,13 +4109,11 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
             case INDEX_op_insn_start:
             {
                 if (num_insns >= 0) {
-                    //size_t off = tcg_current_code_size(s);
                     s->gen_insn_end_off[num_insns] = current_insn_num;
                     /* Assert that we do not overflow our stored offset.  */
                     assert(s->gen_insn_end_off[num_insns] == current_insn_num);
                 }
                 num_insns++;
-//                current_insn_num++;
                 int i;
                 for (i = 0; i < TARGET_INSN_START_WORDS; ++i) {
                     target_ulong a;
@@ -4217,10 +4150,8 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                 const int nb_oargs = TCGOP_CALLO(op);
                 const int nb_iargs = TCGOP_CALLI(op);
                 tcg_insn_unit *func_addr;
-                int flags;
 
                 func_addr = (tcg_insn_unit *)(intptr_t)op->args[nb_oargs + nb_iargs];
-                flags = op->args[nb_oargs + nb_iargs + 1];
 
                 int nb_regs = ARRAY_SIZE(tcg_target_call_iarg_regs);
                 if (nb_regs > nb_iargs) {
@@ -4228,12 +4159,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                 }
                 LLVMValueRef params_helper_func[11];
                 params_helper_func[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), (uint64_t)(func_addr), 0);
-
-//                printf("gen op_call, func = %llu\n", func_addr);
-//                printf("gen op_call, nb_iargs = %llu\n", nb_iargs);
-//                printf("gen op_call, nb_oargs = %llu\n", nb_oargs);
-//                printf("&env->reg[0] = %llu\n", (uint64_t)(&env->regs[0]));
-
                 for(int i = 0; i < nb_iargs; ++i)
                 {
                     int arg = temp_idx(arg_temp(op->args[nb_oargs+i]));
@@ -4469,23 +4394,13 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
             case INDEX_op_ld_i32:
             {
                 arg0 = temp_idx(arg_temp(op->args[0]));
-//                debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), arg0, 0);
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
                 arg1 = temp_idx(arg_temp(op->args[1]));
-//                debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), arg1, 0);
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_start, debug_params, 1, "");
-//                debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), op->args[2], 0);
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_start, debug_params, 1, "");
 
                 LLVMValueRef T1 = LLVMBuildZExt(IR, LLVMBuildLoad2(IR, temp_val_types[arg1], llvm_temps[arg1], ""), temp_val_type, "");
-//                debug_params[0] = T1;
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_start, debug_params, 1, "");
 
                 LLVMValueRef T2 = LLVMBuildSExt(IR, LLVMConstInt(LLVMInt32TypeInContext(llvm_ctx), op->args[2], 1), temp_val_type, "");
 
                 LLVMValueRef Addr = LLVMBuildAdd(IR, T1, T2, "");
-//                debug_params[0] = Addr;
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_start, debug_params, 1, "");
 
                 LLVMValueRef params[1];
                 params[0] = Addr;
@@ -4557,8 +4472,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                 arg0 = temp_idx(arg_temp(op->args[0]));
                 arg1 = temp_idx(arg_temp(op->args[1]));
                 arg2 = temp_idx(arg_temp(op->args[2]));
-//                LLVMValueRef T1 = LLVMBuildZExt(IR, LLVMBuildTrunc(IR, LLVMBuildLoad2(IR, temp_val_types[arg1], llvm_temps[arg1], ""), LLVMInt32TypeInContext(llvm_ctx), ""), temp_val_type, "");
-//                LLVMValueRef T2 = LLVMBuildZExt(IR, LLVMBuildTrunc(IR, LLVMBuildLoad2(IR, temp_val_types[arg2], llvm_temps[arg2], ""), LLVMInt32TypeInContext(llvm_ctx), ""), temp_val_type, "");
                 LLVMValueRef T1 = LLVMBuildTrunc(IR, LLVMBuildLoad2(IR, temp_val_types[arg1], llvm_temps[arg1], ""), LLVMInt32TypeInContext(llvm_ctx), "");
                 LLVMValueRef T2 = LLVMBuildTrunc(IR, LLVMBuildLoad2(IR, temp_val_types[arg2], llvm_temps[arg2], ""), LLVMInt32TypeInContext(llvm_ctx), "");
                 LLVMValueRef Result = LLVMBuildTrunc(IR, LLVMBuildSub(IR, T1, T2, ""), LLVMInt32TypeInContext(llvm_ctx), "");
@@ -5340,7 +5253,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                 arg1 = temp_idx(arg_temp(op->args[1]));
                 LLVMValueRef T1 = LLVMBuildTrunc(IR, LLVMBuildLoad2(IR, temp_val_types[arg1], llvm_temps[arg1], ""), LLVMInt32TypeInContext(llvm_ctx), "");
                 LLVMValueRef S64 = LLVMBuildSExt(IR, T1, LLVMInt64TypeInContext(llvm_ctx), "");
-//                printf("INDEX_op_ext_i32_i64, arg0 = %llu\n", arg0);
                 LLVMBuildStore(IR, S64, llvm_temps[arg0]);
                 break;
             }
@@ -5630,40 +5542,24 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                 LLVMValueRef tmp32;
                 LLVMValueRef tmp16;
                 int debug = 0;
-//                printf("debug = %d\n", debug++);
                 arg0 = temp_idx(arg_temp(op->args[nxt_arg++]));
-//                printf("debug = %d\n", debug++);
                 if (TCG_TARGET_REG_BITS == 32) {
                     arg1 = temp_idx(arg_temp(op->args[nxt_arg++]));
                 }
                 arg2 = temp_idx(arg_temp(op->args[nxt_arg++]));
-
-//                debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), arg2, 0);
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-//                printf("debug = %d\n", debug++);
                 LLVMValueRef taddr = LLVMBuildLoad2(IR, temp_val_types[arg2], llvm_temps[arg2], "");
-//                debug_params[0] = taddr;
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-//                printf("debug = %d\n", debug++);
 #if TARGET_LONG_BITS > TCG_TARGET_REG_BITS
                 arg3 = temp_idx(arg_temp(op->args[nxt_arg++]));
                 taddr = LLVMBuildAdd(IR, LLVMBuildZExt(IR, taddr, LLVMInt64TypeInContext(llvm_ctx), ""), LLVMBuildShl(IR, LLVMBuildZExt(IR, LLVMBuildLoad2(IR, temp_val_types[arg3], llvm_temps[arg3], ""), LLVMInt64TypeInContext(llvm_ctx), ""), LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), 32, 0), ""));
 #endif
                 oi = op->args[nxt_arg++];
-//                printf("debug = %d\n", debug++);
                 LLVMValueRef tmp64;
 #ifdef CONFIG_SOFTMMU
-//                printf("debug = %d\n", debug++);
                 LLVMValueRef qemu_ld_params[4];
-//                printf("debug = %d\n", debug++);
                 qemu_ld_params[0] = LLVMConstInt(temp_val_type, (uint64_t)(env), 0);
-//                printf("debug = %d\n", debug++);
                 qemu_ld_params[1] = taddr;
-//                printf("debug = %d\n", debug++);
                 qemu_ld_params[2] = LLVMConstInt(LLVMInt32TypeInContext(llvm_ctx), oi, 0);
-//                printf("debug = %d\n", debug++);
                 qemu_ld_params[3] = TbPtr;
-//                printf("debug = %d\n", debug++);
                 switch (get_memop(oi) & (MO_BSWAP | MO_SSIZE)) {
                     case MO_UB:
                         tmp64 = LLVMBuildZExt(IR, LLVMBuildTrunc(IR, LLVMBuildCall2(IR, funcType_qemu_ld, Helper_ret_ldub_mmu, qemu_ld_params, 4, ""), LLVMInt8TypeInContext(llvm_ctx), ""), LLVMInt64TypeInContext(llvm_ctx), "");
@@ -5709,8 +5605,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                 taddr = LLVMBuildAdd(IR, LLVMBuildZExt(IR, LLVMBuildTrunc(IR, taddr, target_addr_type, ""), temp_val_type, ""), LLVMConstInt(temp_val_type, guest_base, 0), "");
                 LLVMValueRef ld_params[1];
                 ld_params[0] = taddr;
-//                debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), get_memop(oi) & (MO_BSWAP | MO_SSIZE), 0);
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
                 switch (get_memop(oi) & (MO_BSWAP | MO_SSIZE)) {
                     case MO_UB:
                         tmp64 = LLVMBuildZExt(IR, LLVMBuildCall2(IR, funcType_ld8, func_ld8, ld_params, 1, ""), LLVMInt64TypeInContext(llvm_ctx), "");
@@ -5765,8 +5659,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                         break;
                     }
                     case MO_LEQ: {
-//                        debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), guest_base, 0);
-//                        LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
                         tmp64 = LLVMBuildCall2(IR, funcType_ld64, func_ld64, ld_params, 1, "");
 #if defined(HOST_WORDS_BIGENDIAN)
                         LLVMValueRef B1 = LLVMBuildShl(IR, LLVMBuildAnd(IR, tmp64, LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), 0x00000000000000FFULL, 0), ""), LLVMConstInt(LLVMInt32TypeInContext(llvm_ctx), 56, 0), "");
@@ -5913,9 +5805,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                         break;
                 }
 #endif
-//                debug_params[0] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), 123456, 0);
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
-//                printf("debug = %d\n", debug++);
                 if (TCG_TARGET_REG_BITS == 32) {
                     LLVMValueRef Low = LLVMBuildTrunc(IR, tmp64, LLVMInt32TypeInContext(llvm_ctx), "");
                     LLVMValueRef High = LLVMBuildTrunc(IR, LLVMBuildLShr(IR, tmp64, LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), 32, 0), ""), LLVMInt32TypeInContext(llvm_ctx), "");
@@ -5926,7 +5815,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                 {
                     LLVMBuildStore(IR, LLVMBuildTrunc(IR, tmp64, temp_val_types[arg0], ""), llvm_temps[arg0]);
                 }
-//                printf("debug = %d\n", debug++);
                 break;
             }
             case INDEX_op_qemu_st_i32: {
@@ -5944,7 +5832,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                 oi = op->args[2];
 #endif
 #ifdef CONFIG_SOFTMMU
-                //printf("INDEX_op_qemu_st_i32\n");
                 LLVMValueRef qemu_st_params[5];
                 qemu_st_params[0] = LLVMConstInt(temp_val_type, (uint64_t)(env), 0);
                 qemu_st_params[1] = taddr;
@@ -6054,7 +5941,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
             }
             case INDEX_op_qemu_st_i64:
             {
-//                printf("INDEX_op_qemu_st_i64\n");
                 LLVMValueRef tmp64;
                 LLVMValueRef tmp16;
                 LLVMValueRef tmp32;
@@ -6074,8 +5960,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
 #endif
                 arg2 = temp_idx(arg_temp(op->args[nxt_arg++]));
                 LLVMValueRef taddr = LLVMBuildZExt(IR, LLVMBuildLoad2(IR, temp_val_types[arg2], llvm_temps[arg2], ""), LLVMInt64TypeInContext(llvm_ctx), "");
-//                debug_params[0] = taddr;
-//                LLVMBuildCall2(IR, funcType_debug, Debug_print_end, debug_params, 1, "");
 #if TARGET_LONG_BITS > TCG_TARGET_REG_BITS
                 arg3 = temp_idx(arg_temp(op->args[nxt_arg++]));
                 taddr = LLVMBuildAdd(IR, LLVMBuildZExt(IR, taddr, LLVMInt64TypeInContext(llvm_ctx), ""), LLVMBuildShl(IR, LLVMBuildZExt(IR, LLVMBuildLoad2(IR, temp_val_types[arg3], llvm_temps[arg3], ""), LLVMInt64TypeInContext(llvm_ctx), ""), LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), 32, 0), ""));
@@ -6086,7 +5970,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                 qemu_st_params[0] = LLVMConstInt(temp_val_type, (uint64_t)(env), 0);
                 qemu_st_params[1] = taddr;
                 qemu_st_params[2] = tmp64;
-                //qemu_st_params[2] = LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), 0, 0);
                 qemu_st_params[3] = LLVMConstInt(LLVMInt32TypeInContext(llvm_ctx), oi, 0);
                 qemu_st_params[4] = TbPtr;
                 switch (get_memop(oi) & (MO_BSWAP | MO_SIZE)) {
@@ -6119,7 +6002,6 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                 taddr = LLVMBuildAdd(IR, LLVMBuildZExtOrBitCast(IR, LLVMBuildTrunc(IR, taddr, target_addr_type, ""), temp_val_type, ""), LLVMConstInt(temp_val_type, guest_base, 0), "");
                 LLVMValueRef st_params[2];
                 st_params[1] = taddr;
-//                LLVMValueRef t0 = LLVMBuildLoad2(IR, temp_val_types[arg0], llvm_temps[arg0], "");
                 switch (get_memop(oi) & (MO_BSWAP | MO_SIZE)) {
                     case MO_UB:
                         st_params[0] = LLVMBuildTrunc(IR, tmp64, LLVMInt8TypeInContext(llvm_ctx), "");
@@ -6265,14 +6147,9 @@ int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
                 printf("unsupported op = %llu\n ", opc);
                 break;
         }
-//        if(tb->seq_num > 18000)
-//            printf("gen opc finish, opc = %llu\n", opc);
     }
 
     LLVMBuildRet(IR, LLVMConstInt(LLVMInt64TypeInContext(llvm_ctx), (unsigned long long)(-1), 0));
-//    if(tb->seq_num > 18000)
-//        printf("gen_code finish, tb->seq_num = %llu\n", tb->seq_num);
-//    printf("llvm_gen_code end\n");
     return current_insn_num;
 }
 

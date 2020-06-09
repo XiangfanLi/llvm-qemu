@@ -144,21 +144,17 @@ static LLVMGenericValueRef Args[1];
 
 static unsigned long long exec_num = 0;
 
+struct timespec m_start;
+struct timespec m_end;
+
 /* Execute a TB, and fix up the CPU state afterwards if necessary */
 static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
 {
-//    printf("cpu_tb_exec begin\n");
-//    ++exec_num;
     CPUArchState *env = cpu->env_ptr;
-//    if(itb->seq_num > 12000) {
-//        printf("itb->seq_num = %llu,  exec_num = %llu, env = %llu\n", itb->seq_num, exec_num, (uint64_t)env);
-//    }
     uintptr_t ret;
     TranslationBlock *last_tb;
     int tb_exit;
     uint8_t *tb_ptr = itb->tc.ptr;
-//    LLVMValueRef func_ptr = itb->func_ptr;
-
     qemu_log_mask_and_addr(CPU_LOG_EXEC, itb->pc,
                            "Trace %d: %p ["
                            TARGET_FMT_lx "/" TARGET_FMT_lx "/%#x] %s\n",
@@ -182,73 +178,37 @@ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
     }
 #endif /* DEBUG_DISAS */
 
-    //ret = tcg_qemu_tb_exec(env, tb_ptr);
-
     TranslationBlock* curr_tb = itb;
-
-//    printf("cpu_tb_exec before for loop\n");
     for(;;) {
-//        printf("cpu_tb_exec before for loop begin\n");
         LLVMValueRef func_ptr = curr_tb->func_ptr;
         curr_tb->exec_cnt++;
-        //gettimeofday(&m_start, NULL);
         if (curr_tb->exec_cnt > 5) { // use JITCompiler
             if (curr_tb->p == NULL) {
-//            printf("before LLVMGetPointerToGlobal\n");
                 curr_tb->p = LLVMGetPointerToGlobal(EE, func_ptr);
-//            printf("after LLVMGetPointerToGlobal\n");
             }
-//            clock_gettime(CLOCK_REALTIME, &m_start);
-//            LLVMGenericValueRef RetValue = LLVMRunFunction(EE, func_ptr, 0, Args);
-//            printf("JIT run function start\n");
+            // execute machine code directly
             ret = curr_tb->p();
-//            printf("JIT run function finished\n");
-            //gettimeofday(&m_end, NULL);
-//            clock_gettime(CLOCK_REALTIME, &m_end);
-//            double run_time = (double) (m_end.tv_sec - m_start.tv_sec) * 1000000.0 +
-//                              (double) (m_end.tv_nsec - m_start.tv_nsec) / 1000.0;
-//            FILE *fp = fopen(tb->file_name, "a");
-//            fprintf(fp, "run time of round #%llu : %f us\n", tb->exec_cnt, run_time);
-//            if (tb->exec_cnt > 1) {
-//                tb->total_run_time += run_time;
-//                fprintf(fp, "total run time of round #%llu : %f us\n", tb->exec_cnt, tb->total_run_time);
-//            }
-//            fclose(fp);
-//            next_tb = LLVMGenericValueToInt(RetValue, 0);
         } else {
-            //printf("before interprete\n");
             if (!last_tb_exec_safe_return) {
-//                printf("reset_interpreter\n");
+                // The last TB may not be returned by the return statement during the execution process. At this time, the Interpreter needs to be re-initialized.
                 reset_interpreter(env);
-//            printf("env->regs[4] = %llu\n", env->regs[4]);
             }
             last_tb_exec_safe_return = false;
-//        printf("before interpreter exec\n");
             LLVMGenericValueRef RetValue = LLVMRunFunction(Interpreter, func_ptr, 0, Args);
-//        printf("after interpreter exec\n");
             last_tb_exec_safe_return = true;
             ret = LLVMGenericValueToInt(RetValue, 0);
-//            printf("ret = %llu\n", ret);
         }
-//        printf("1\n");
         last_tb = (TranslationBlock *)(ret & ~TB_EXIT_MASK);
-//        printf("2\n");
         tb_exit = ret & TB_EXIT_MASK;
-//        printf("3\n");\
-//        printf("tb_exit = %d\n", tb_exit);
-//        printf("last_tb = %llu\n", last_tb);
         if(last_tb != 0 && tb_exit <= TB_EXIT_IDX1 && last_tb->llvm_jmp_dest[tb_exit] != NULL)
         {
-//            printf("4\n");
             curr_tb = last_tb->llvm_jmp_dest[tb_exit];
-//            printf("5\n");
         }
         else
         {
             break;
         }
     }
-//    printf("exit for loop\n");
 
 
     cpu->can_do_io = 1;
@@ -274,7 +234,6 @@ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
             cc->set_pc(cpu, last_tb->pc);
         }
     }
-//    printf("cpu_tb_exec end\n");
     return ret;
 }
 
@@ -528,10 +487,10 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
     }
 #endif
     /* See if we can patch the calling TB. */
-    if (last_tb && true) {
+    if (last_tb && false) {
 //        printf("before llvm_tb_add_jump\n");
-        //tb_add_jump(last_tb, tb_exit, tb);
-        llvm_tb_add_jump(last_tb, tb_exit, tb);
+        tb_add_jump(last_tb, tb_exit, tb);
+//        llvm_tb_add_jump(last_tb, tb_exit, tb);
 //        printf("after llvm_tb_add_jump\n");
     }
     return tb;
