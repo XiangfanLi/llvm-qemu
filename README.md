@@ -13,7 +13,7 @@ Using LLVM to accelerate Qemu's binary translation mechanism. Currently only sup
 ## 编译命令
 在项目的主路径下, 执行下面的命令
 ```
-./configure --target-list=x86_64-linux-user --enable-tcg-interpreter
-make
+$ ./configure --target-list=x86_64-linux-user --enable-tcg-interpreter
+$ make
 ```
 执行上述命令后, 将在./x86_64-linux-user 下得到可执行程序qemu-x86_64
