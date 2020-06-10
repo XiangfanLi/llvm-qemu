@@ -1,5 +1,5 @@
 # llvm-qemu
-Using LLVM to accelerate Qemu's binary translation mechanism. Currently only supports x86_64 program execution on aarch64. Performance has been significantly improved. Integer Index under nbench test increased from 0.5438 to 3.1150.
+Using LLVM to optimize Qemu's binary translation mechanism. Currently only supports x86_64 program execution on aarch64. Performance has been significantly improved. Integer Index under nbench test increased from 0.5438 to 3.1150.
 
 ## 实现要点
 * 使用LLVM IR(intermedaite representation) 代替TCG code作中间代码
