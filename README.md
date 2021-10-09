@@ -3,7 +3,7 @@ Using LLVM to optimize Qemu's binary translation mechanism. Currently only suppo
 
 ## 实现要点
 * 使用LLVM IR(intermedaite representation) 代替TCG code作中间代码
-* 在函数`llvm_gen_code`中， 实现了将解析机器码所得到的tcg ops逐条翻译为LLVM IR指令, 并用这些指令构建一个LLVM Function. [tcg/tcg.c](https://github.com/XiangfanLi/llvm-qemu/blob/52fb7d37530a2048d0a8dd110bd5c626b85a4217/tcg/tcg.c#L4022)
+* 在函数`llvm_gen_code`中， 实现了将解析机器码所得到的tcg ops逐条翻译为LLVM IR指令, 并用这些指令构建一个LLVM Function. [(tcg/tcg.c)](https://github.com/XiangfanLi/llvm-qemu/blob/52fb7d37530a2048d0a8dd110bd5c626b85a4217/tcg/tcg.c#L4022)
   ```c++
   // transfer TCG intermediate code to LLVM IR (intermediate representation)
   int llvm_gen_code(CPUArchState *env, TCGContext *s, TranslationBlock *tb)
@@ -34,7 +34,7 @@ Using LLVM to optimize Qemu's binary translation mechanism. Currently only suppo
                   break;
               }
   ```
-* 往后将该地址作为普通函数调用, 即可直接执行其中的机器代码 [accel/tcg/cpu-exec.c](https://github.com/XiangfanLi/llvm-qemu/blob/52fb7d37530a2048d0a8dd110bd5c626b85a4217/accel/tcg/cpu-exec.c#L182)
+* 往后将该地址作为普通函数调用, 即可直接执行其中的机器代码 [(accel/tcg/cpu-exec.c)](https://github.com/XiangfanLi/llvm-qemu/blob/52fb7d37530a2048d0a8dd110bd5c626b85a4217/accel/tcg/cpu-exec.c#L182)
 ```c++
 for(;;) {
         LLVMValueRef func_ptr = curr_tb->func_ptr;
